@@ -1,0 +1,49 @@
+name: Build Windows EXE (Python 3.8 32-bit / Win7 compatible)
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+    paths:
+      - "NADEF18v_0405-VC22.py"
+      - "requirements.txt"
+      - ".github/workflows/build-exe.yml"
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # پایتون 3.8.10 نسخه‌ی 32-بیتی؛ آخرین نسخه‌ای که رسمی از ویندوز 7 پشتیبانی می‌کند
+      - name: Set up Python 3.8 (32-bit)
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.8.10"
+          architecture: "x86"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      # ساخت exe؛ آیکون خودِ فایل exe از dispenserlogo.ico،
+      # و barlogo.ico + firstlogo.png به‌عنوان فایل‌های کنار برنامه (Additional Files) اضافه می‌شوند
+      - name: Build EXE with PyInstaller
+        shell: cmd
+        run: >
+          pyinstaller --onefile --windowed ^
+          --icon=dispenserlogo.ico ^
+          --add-data "barlogo.ico;." ^
+          --add-data "firstlogo.png;." ^
+          --hidden-import=persiantools.jdatetime ^
+          --name NADEF18 ^
+          NADEF18v_0405-VC22.py
+
+      - name: Upload EXE artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: NADEF18-exe-win7-x86
+          path: dist/NADEF18.exe
