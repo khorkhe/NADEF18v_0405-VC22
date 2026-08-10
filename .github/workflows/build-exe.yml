@@ -39,11 +39,11 @@ jobs:
           --add-data "barlogo.ico;." ^
           --add-data "firstlogo.png;." ^
           --hidden-import=persiantools.jdatetime ^
-          --name NADEF18 ^
+          --name NADEF18-PRO ^
           NADEF18v_0405-VC22.py
 
       - name: Upload EXE artifact
         uses: actions/upload-artifact@v4
         with:
           name: NADEF18-exe-win7-x86
-          path: dist/NADEF18.exe
+          path: dist/NADEF18-PRO.exe
